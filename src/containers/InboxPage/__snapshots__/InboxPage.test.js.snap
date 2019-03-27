@@ -91,6 +91,15 @@ exports[`InboxPage matches snapshot 1`] = `
                 "now": [Function],
               }
             }
+            stateData={
+              Object {
+                "bookingClassName": undefined,
+                "lastTransitionedAtClassName": undefined,
+                "nameClassName": undefined,
+                "state": "InboxPage.stateRequested",
+                "stateClassName": undefined,
+              }
+            }
             tx={
               Object {
                 "attributes": Object {
@@ -154,6 +163,8 @@ exports[`InboxPage matches snapshot 1`] = `
                 },
                 "booking": Object {
                   "attributes": Object {
+                    "displayEnd": 2017-02-16T00:00:00.000Z,
+                    "displayStart": 2017-02-15T00:00:00.000Z,
                     "end": 2017-02-16T00:00:00.000Z,
                     "start": 2017-02-15T00:00:00.000Z,
                   },
@@ -165,6 +176,7 @@ exports[`InboxPage matches snapshot 1`] = `
                 "customer": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "customer-user-id display name",
@@ -182,6 +194,7 @@ exports[`InboxPage matches snapshot 1`] = `
                 "provider": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "provider-user-id display name",
@@ -214,6 +227,15 @@ exports[`InboxPage matches snapshot 1`] = `
                 "formatRelative": [Function],
                 "formatTime": [Function],
                 "now": [Function],
+              }
+            }
+            stateData={
+              Object {
+                "bookingClassName": undefined,
+                "lastTransitionedAtClassName": undefined,
+                "nameClassName": undefined,
+                "state": "InboxPage.stateRequested",
+                "stateClassName": undefined,
               }
             }
             tx={
@@ -279,6 +301,8 @@ exports[`InboxPage matches snapshot 1`] = `
                 },
                 "booking": Object {
                   "attributes": Object {
+                    "displayEnd": 2017-03-16T00:00:00.000Z,
+                    "displayStart": 2017-03-15T00:00:00.000Z,
                     "end": 2017-03-16T00:00:00.000Z,
                     "start": 2017-03-15T00:00:00.000Z,
                   },
@@ -290,6 +314,7 @@ exports[`InboxPage matches snapshot 1`] = `
                 "customer": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "customer-user-id display name",
@@ -307,6 +332,7 @@ exports[`InboxPage matches snapshot 1`] = `
                 "provider": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "provider-user-id display name",
@@ -364,7 +390,11 @@ exports[`InboxPage matches snapshot 2`] = `
       <div
         className=""
       >
-        provider-user-id display name
+        <span
+          className=""
+        >
+          provider-user-id display name
+        </span>
       </div>
       <div
         className=""
@@ -483,6 +513,15 @@ exports[`InboxPage matches snapshot 3`] = `
                 "now": [Function],
               }
             }
+            stateData={
+              Object {
+                "bookingClassName": undefined,
+                "lastTransitionedAtClassName": undefined,
+                "nameClassName": undefined,
+                "state": "InboxPage.statePending",
+                "stateClassName": undefined,
+              }
+            }
             tx={
               Object {
                 "attributes": Object {
@@ -546,6 +585,8 @@ exports[`InboxPage matches snapshot 3`] = `
                 },
                 "booking": Object {
                   "attributes": Object {
+                    "displayEnd": 2017-02-16T00:00:00.000Z,
+                    "displayStart": 2017-02-15T00:00:00.000Z,
                     "end": 2017-02-16T00:00:00.000Z,
                     "start": 2017-02-15T00:00:00.000Z,
                   },
@@ -557,6 +598,7 @@ exports[`InboxPage matches snapshot 3`] = `
                 "customer": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "customer-user-id display name",
@@ -574,6 +616,7 @@ exports[`InboxPage matches snapshot 3`] = `
                 "provider": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "provider-user-id display name",
@@ -606,6 +649,15 @@ exports[`InboxPage matches snapshot 3`] = `
                 "formatRelative": [Function],
                 "formatTime": [Function],
                 "now": [Function],
+              }
+            }
+            stateData={
+              Object {
+                "bookingClassName": undefined,
+                "lastTransitionedAtClassName": undefined,
+                "nameClassName": undefined,
+                "state": "InboxPage.statePending",
+                "stateClassName": undefined,
               }
             }
             tx={
@@ -671,6 +723,8 @@ exports[`InboxPage matches snapshot 3`] = `
                 },
                 "booking": Object {
                   "attributes": Object {
+                    "displayEnd": 2017-03-16T00:00:00.000Z,
+                    "displayStart": 2017-03-15T00:00:00.000Z,
                     "end": 2017-03-16T00:00:00.000Z,
                     "start": 2017-03-15T00:00:00.000Z,
                   },
@@ -682,6 +736,7 @@ exports[`InboxPage matches snapshot 3`] = `
                 "customer": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "customer-user-id display name",
@@ -699,6 +754,7 @@ exports[`InboxPage matches snapshot 3`] = `
                 "provider": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "provider-user-id display name",
@@ -758,7 +814,11 @@ exports[`InboxPage matches snapshot 4`] = `
       <div
         className=""
       >
-        customer-user-id display name
+        <span
+          className=""
+        >
+          customer-user-id display name
+        </span>
       </div>
       <div
         className=""

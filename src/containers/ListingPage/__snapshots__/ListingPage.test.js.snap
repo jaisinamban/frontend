@@ -66,6 +66,7 @@ exports[`ListingPage matches snapshot 1`] = `
               "author": Object {
                 "attributes": Object {
                   "banned": false,
+                  "deleted": false,
                   "profile": Object {
                     "abbreviatedName": "TT",
                     "displayName": "user-1 display name",
@@ -99,6 +100,7 @@ exports[`ListingPage matches snapshot 1`] = `
               Object {
                 "attributes": Object {
                   "banned": false,
+                  "deleted": false,
                   "profile": Object {
                     "abbreviatedName": "TT",
                     "displayName": "user-1 display name",
@@ -199,6 +201,7 @@ exports[`ListingPage matches snapshot 1`] = `
                 Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "email": "user-2@example.com",
                     "emailVerified": true,
                     "profile": Object {
@@ -207,7 +210,6 @@ exports[`ListingPage matches snapshot 1`] = `
                       "firstName": "user-2 first name",
                       "lastName": "user-2 last name",
                     },
-                    "stripeConnected": true,
                   },
                   "id": UUID {
                     "uuid": "user-2",
@@ -236,6 +238,7 @@ exports[`ListingPage matches snapshot 1`] = `
                   "author": Object {
                     "attributes": Object {
                       "banned": false,
+                      "deleted": false,
                       "profile": Object {
                         "abbreviatedName": "TT",
                         "displayName": "user-1 display name",
@@ -262,15 +265,9 @@ exports[`ListingPage matches snapshot 1`] = `
               title="listing1 title"
             />
           </div>
-          <SectionBooking
+          <withRouter(InjectIntl(BookingPanel))
             authorDisplayName="user-1 display name"
             fetchTimeSlotsError={null}
-            formattedPrice={55}
-            handleBookButtonClick={[Function]}
-            handleBookingSubmit={[Function]}
-            handleMobileBookModalClose={[Function]}
-            isBook={false}
-            isClosed={false}
             isOwnListing={false}
             listing={
               Object {
@@ -292,6 +289,7 @@ exports[`ListingPage matches snapshot 1`] = `
                 "author": Object {
                   "attributes": Object {
                     "banned": false,
+                    "deleted": false,
                     "profile": Object {
                       "abbreviatedName": "TT",
                       "displayName": "user-1 display name",
@@ -310,23 +308,25 @@ exports[`ListingPage matches snapshot 1`] = `
               }
             }
             onManageDisableScrolling={[Function]}
-            price={
-              Money {
-                "amount": 5500,
-                "currency": "USD",
-              }
-            }
-            priceTitle={55}
-            richTitle={
-              <span>
-                
-                listing1
-                 
-                title
-                
-              </span>
-            }
+            onSubmit={[Function]}
+            subTitle="ListingPage.bookingSubTitle"
             timeSlots={null}
+            title={
+              <FormattedMessage
+                id="ListingPage.bookingTitle"
+                values={
+                  Object {
+                    "title": <span>
+                      
+                      listing1
+                       
+                      title
+                      
+                  </span>,
+                  }
+                }
+              />
+            }
             unitType="line-item/night"
           />
         </div>

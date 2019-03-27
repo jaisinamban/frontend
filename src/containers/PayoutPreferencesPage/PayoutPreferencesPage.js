@@ -6,7 +6,7 @@ import { injectIntl, intlShape, FormattedMessage } from 'react-intl';
 import { ensureCurrentUser } from '../../util/data';
 import { propTypes } from '../../util/types';
 import { isScrollingDisabled } from '../../ducks/UI.duck';
-import { stripeAccountClearError } from '../../ducks/user.duck';
+import { stripeAccountClearError } from '../../ducks/stripe.duck';
 import {
 	LayoutSideNavigation,
 	LayoutWrapperMain,
@@ -131,6 +131,105 @@ export const PayoutPreferencesPageComponent = props => {
 			</LayoutSideNavigation>
 		</Page>
 	);
+=======
+  const {
+    currentUser,
+    scrollingDisabled,
+    createStripeAccountError,
+    onPayoutDetailsFormChange,
+    onPayoutDetailsFormSubmit,
+    payoutDetailsSaveInProgress,
+    payoutDetailsSaved,
+    intl,
+  } = props;
+
+  const ensuredCurrentUser = ensureCurrentUser(currentUser);
+  const currentUserLoaded = !!ensuredCurrentUser.id;
+  const stripeConnected =
+    currentUserLoaded &&
+    !!ensuredCurrentUser.stripeAccount &&
+    !!ensuredCurrentUser.stripeAccount.id;
+
+  const tabs = [
+    {
+      text: <FormattedMessage id="PayoutPreferencesPage.contactDetailsTabTitle" />,
+      selected: false,
+      linkProps: {
+        name: 'ContactDetailsPage',
+      },
+    },
+    {
+      text: <FormattedMessage id="PayoutPreferencesPage.passwordTabTitle" />,
+      selected: false,
+      linkProps: {
+        name: 'PasswordChangePage',
+      },
+    },
+    {
+      text: <FormattedMessage id="PayoutPreferencesPage.paymentsTabTitle" />,
+      selected: true,
+      linkProps: {
+        name: 'PayoutPreferencesPage',
+      },
+    },
+  ];
+
+  const title = intl.formatMessage({ id: 'PayoutPreferencesPage.title' });
+  const formDisabled = !currentUserLoaded || stripeConnected || payoutDetailsSaved;
+
+  let message = <FormattedMessage id="PayoutPreferencesPage.loadingData" />;
+
+  if (currentUserLoaded && payoutDetailsSaved) {
+    message = <FormattedMessage id="PayoutPreferencesPage.payoutDetailsSaved" />;
+  } else if (currentUserLoaded && stripeConnected) {
+    message = <FormattedMessage id="PayoutPreferencesPage.stripeAlreadyConnected" />;
+  } else if (currentUserLoaded && !stripeConnected) {
+    message = <FormattedMessage id="PayoutPreferencesPage.stripeNotConnected" />;
+  }
+
+  const showForm =
+    currentUserLoaded && (payoutDetailsSaveInProgress || payoutDetailsSaved || !stripeConnected);
+  const form = showForm ? (
+    <PayoutDetailsForm
+      disabled={formDisabled}
+      inProgress={payoutDetailsSaveInProgress}
+      ready={payoutDetailsSaved}
+      submitButtonText={intl.formatMessage({ id: 'PayoutPreferencesPage.submitButtonText' })}
+      createStripeAccountError={createStripeAccountError}
+      onChange={onPayoutDetailsFormChange}
+      onSubmit={onPayoutDetailsFormSubmit}
+      currentUserId={ensuredCurrentUser.id}
+    />
+  ) : null;
+
+  return (
+    <Page title={title} scrollingDisabled={scrollingDisabled}>
+      <LayoutSideNavigation>
+        <LayoutWrapperTopbar>
+          <TopbarContainer
+            currentPage="PayoutPreferencesPage"
+            desktopClassName={css.desktopTopbar}
+            mobileClassName={css.mobileTopbar}
+          />
+          <UserNav selectedPageName="PayoutPreferencesPage" />
+        </LayoutWrapperTopbar>
+        <LayoutWrapperSideNav tabs={tabs} />
+        <LayoutWrapperMain>
+          <div className={css.content}>
+            <h1 className={css.title}>
+              <FormattedMessage id="PayoutPreferencesPage.heading" />
+            </h1>
+            <p>{message}</p>
+            {form}
+          </div>
+        </LayoutWrapperMain>
+        <LayoutWrapperFooter>
+          <Footer />
+        </LayoutWrapperFooter>
+      </LayoutSideNavigation>
+    </Page>
+  );
+>>>>>>> upstream/master
 };
 
 PayoutPreferencesPageComponent.defaultProps = {
@@ -162,6 +261,17 @@ const mapStateToProps = state => {
 		payoutDetailsSaved,
 		scrollingDisabled: isScrollingDisabled(state),
 	};
+  const { createStripeAccountError } = state.stripe;
+  const { currentUser } = state.user;
+  const { payoutDetailsSaveInProgress, payoutDetailsSaved } = state.PayoutPreferencesPage;
+  return {
+    currentUser,
+    createStripeAccountError,
+    payoutDetailsSaveInProgress,
+    payoutDetailsSaved,
+    scrollingDisabled: isScrollingDisabled(state),
+  };
+>>>>>>> upstream/master
 };
 
 const mapDispatchToProps = dispatch => ({

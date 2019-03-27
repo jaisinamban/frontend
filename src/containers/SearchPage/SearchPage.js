@@ -53,7 +53,6 @@ export class SearchPageComponent extends Component {
 
   filters() {
     const { amenities, regularlyOpenOn, groupSize, listingTypes } = this.props;
-
     return {
       amenitiesFilter: {
         paramName: 'pub_amenities',
@@ -70,6 +69,10 @@ export class SearchPageComponent extends Component {
       listingTypeFilter: {
         paramName: 'pub_type',
         options: listingTypes,
+      },
+      dateRangeFilter: {
+        paramName: 'dates',
+        config: dateRangeFilterConfig,
       },
     };
   }

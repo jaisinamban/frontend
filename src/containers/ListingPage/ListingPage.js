@@ -16,11 +16,15 @@ import {
   LISTING_PAGE_PARAM_TYPE_DRAFT,
   LISTING_PAGE_PARAM_TYPE_EDIT,
   createSlug,
-  parse,
 } from '../../util/urlHelpers';
 import { formatMoney } from '../../util/currency';
 import { createResourceLocatorString, findRouteByRouteName } from '../../util/routes';
-import { ensureListing, ensureOwnListing, ensureUser, userDisplayName } from '../../util/data';
+import {
+  ensureListing,
+  ensureOwnListing,
+  ensureUser,
+  userDisplayNameAsString,
+} from '../../util/data';
 import { richText } from '../../util/richText';
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { manageDisableScrolling, isScrollingDisabled } from '../../ducks/UI.duck';
@@ -33,6 +37,7 @@ import {
   LayoutWrapperMain,
   LayoutWrapperFooter,
   Footer,
+  BookingPanel,
 } from '../../components';
 import { TopbarContainer, NotFoundPage } from '../../containers';
 
@@ -49,7 +54,6 @@ import SectionReviews from './SectionReviews';
 import SectionHost from './SectionHost';
 import SectionRulesMaybe from './SectionRulesMaybe';
 import SectionMapMaybe from './SectionMapMaybe';
-import SectionBooking from './SectionBooking';
 import css from './ListingPage.css';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
@@ -83,38 +87,6 @@ const priceData = (price, intl) => {
     };
   }
   return {};
-};
-
-const openBookModal = (history, listing) => {
-  if (!listing.id) {
-    // Listing not fully loaded yet
-    return;
-  }
-  const routes = routeConfiguration();
-  history.push(
-    createResourceLocatorString(
-      'ListingPage',
-      routes,
-      { id: listing.id.uuid, slug: createSlug(listing.attributes.title) },
-      { book: true }
-    )
-  );
-};
-
-const closeBookModal = (history, listing) => {
-  if (!listing.id) {
-    // Listing not fully loaded yet
-    return;
-  }
-  const routes = routeConfiguration();
-  history.push(
-    createResourceLocatorString(
-      'ListingPage',
-      routes,
-      { id: listing.id.uuid, slug: createSlug(listing.attributes.title) },
-      {}
-    )
-  );
 };
 
 const categoryLabel = (categories, key) => {
@@ -221,7 +193,6 @@ export class ListingPageComponent extends Component {
       location,
       scrollingDisabled,
       showListingError,
-      history,
       reviews,
       fetchReviewsError,
       sendEnquiryInProgress,
@@ -232,7 +203,6 @@ export class ListingPageComponent extends Component {
       amenitiesConfig,
     } = this.props;
 
-    const isBook = !!parse(location.search).book;
     const listingId = new UUID(rawParams.id);
     const isPendingApprovalVariant = rawParams.variant === LISTING_PAGE_PENDING_APPROVAL_VARIANT;
     const isDraftVariant = rawParams.variant === LISTING_PAGE_DRAFT_VARIANT;
@@ -285,6 +255,11 @@ export class ListingPageComponent extends Component {
         })}
       </span>
     );
+
+    const bookingTitle = (
+      <FormattedMessage id="ListingPage.bookingTitle" values={{ title: richTitle }} />
+    );
+    const bookingSubTitle = intl.formatMessage({ id: 'ListingPage.bookingSubTitle' });
 
     const topbar = <TopbarContainer />;
 
@@ -350,22 +325,17 @@ export class ListingPageComponent extends Component {
     const userAndListingAuthorAvailable = !!(currentUser && authorAvailable);
     const isOwnListing =
       userAndListingAuthorAvailable && currentListing.author.id.uuid === currentUser.id.uuid;
-    const isClosed = currentListing.attributes.state === LISTING_STATE_CLOSED;
     const showContactUser = !currentUser || (currentUser && !isOwnListing);
 
     const currentAuthor = authorAvailable ? currentListing.author : null;
     const ensuredAuthor = ensureUser(currentAuthor);
 
-    const bannedUserDisplayName = intl.formatMessage({
-      id: 'ListingPage.bannedUserDisplayName',
-    });
-    const authorDisplayName = userDisplayName(ensuredAuthor, bannedUserDisplayName);
+    // When user is banned or deleted the listing is also deleted.
+    // Because listing can be never showed with banned or deleted user we don't have to provide
+    // banned or deleted display names for the function
+    const authorDisplayName = userDisplayNameAsString(ensuredAuthor, '');
 
     const { formattedPrice, priceTitle } = priceData(price, intl);
-
-    const handleMobileBookModalClose = () => {
-      closeBookModal(history, currentListing);
-    };
 
     const handleBookingSubmit = values => {
       const isCurrentlyClosed = currentListing.attributes.state === LISTING_STATE_CLOSED;
@@ -373,15 +343,6 @@ export class ListingPageComponent extends Component {
         window.scrollTo(0, 0);
       } else {
         this.handleSubmit(values);
-      }
-    };
-
-    const handleBookButtonClick = () => {
-      const isCurrentlyClosed = currentListing.attributes.state === LISTING_STATE_CLOSED;
-      if (isOwnListing || isCurrentlyClosed) {
-        window.scrollTo(0, 0);
-      } else {
-        openBookModal(history, currentListing);
       }
     };
 
@@ -524,20 +485,15 @@ export class ListingPageComponent extends Component {
                     onManageDisableScrolling={onManageDisableScrolling}
                   />
                 </div>
-                <SectionBooking
+                <BookingPanel
+                  className={css.bookingPanel}
                   listing={currentListing}
                   isOwnListing={isOwnListing}
-                  isClosed={isClosed}
-                  isBook={isBook}
                   unitType={unitType}
-                  price={price}
-                  formattedPrice={formattedPrice}
-                  priceTitle={priceTitle}
-                  handleBookingSubmit={handleBookingSubmit}
-                  richTitle={richTitle}
+                  onSubmit={handleBookingSubmit}
+                  title={bookingTitle}
+                  subTitle={bookingSubTitle}
                   authorDisplayName={authorDisplayName}
-                  handleBookButtonClick={handleBookButtonClick}
-                  handleMobileBookModalClose={handleMobileBookModalClose}
                   onManageDisableScrolling={onManageDisableScrolling}
                   timeSlots={timeSlotsAdjusted}
                   fetchTimeSlotsError={fetchTimeSlotsError}

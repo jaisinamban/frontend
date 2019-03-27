@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import routeConfiguration from '../../routeConfiguration';
 import { pathByRouteName, findRouteByRouteName } from '../../util/routes';
-import { propTypes } from '../../util/types';
+import { propTypes, LINE_ITEM_NIGHT, LINE_ITEM_DAY } from '../../util/types';
 import { ensureListing, ensureUser, ensureTransaction, ensureBooking } from '../../util/data';
 import { dateFromLocalToAPI } from '../../util/dates';
 import { createSlug } from '../../util/urlHelpers';
@@ -19,6 +19,7 @@ import {
   isTransactionZeroPaymentError,
   transactionInitiateOrderStripeErrors,
 } from '../../util/errors';
+import { formatMoney } from '../../util/currency';
 import {
   AvatarMedium,
   BookingBreakdown,
@@ -30,7 +31,12 @@ import {
 } from '../../components';
 import { StripePaymentForm } from '../../forms';
 import { isScrollingDisabled } from '../../ducks/UI.duck';
-import { initiateOrder, setInitialValues, speculateTransaction } from './CheckoutPage.duck';
+import {
+  initiateOrder,
+  initiateOrderAfterEnquiry,
+  setInitialValues,
+  speculateTransaction,
+} from './CheckoutPage.duck';
 import config from '../../config';
 
 import { storeData, storedData, clearData } from './CheckoutPageSessionHelpers';
@@ -75,7 +81,14 @@ export class CheckoutPageComponent extends Component {
    * based on this initial data.
    */
   loadInitialData() {
-    const { bookingData, bookingDates, listing, fetchSpeculatedTransaction, history } = this.props;
+    const {
+      bookingData,
+      bookingDates,
+      listing,
+      enquiredTransaction,
+      fetchSpeculatedTransaction,
+      history,
+    } = this.props;
     // Browser's back navigation should not rewrite data in session store.
     // Action is 'POP' on both history.back() and page refresh cases.
     // Action is 'PUSH' when user has directed through a link
@@ -85,12 +98,12 @@ export class CheckoutPageComponent extends Component {
     const hasDataInProps = !!(bookingData && bookingDates && listing) && hasNavigatedThroughLink;
     if (hasDataInProps) {
       // Store data only if data is passed through props and user has navigated through a link.
-      storeData(bookingData, bookingDates, listing, STORAGE_KEY);
+      storeData(bookingData, bookingDates, listing, enquiredTransaction, STORAGE_KEY);
     }
 
     // NOTE: stored data can be empty if user has already successfully completed transaction.
     const pageData = hasDataInProps
-      ? { bookingData, bookingDates, listing }
+      ? { bookingData, bookingDates, listing, enquiredTransaction }
       : storedData(STORAGE_KEY);
 
     const hasData =
@@ -137,7 +150,13 @@ export class CheckoutPageComponent extends Component {
 
     const cardToken = values.token;
     const initialMessage = values.message;
-    const { history, sendOrderRequest, speculatedTransaction, dispatch } = this.props;
+    const {
+      history,
+      sendOrderRequest,
+      sendOrderRequestAfterEnquiry,
+      speculatedTransaction,
+      dispatch,
+    } = this.props;
 
 		// The transaction type have to be known here, to be passed to sendOrderRequest
 
@@ -159,9 +178,16 @@ export class CheckoutPageComponent extends Component {
 
     };
 
-		console.log('Sending the following transaction', requestParams)
-
     sendOrderRequest(requestParams, initialMessage, listingType)
+    const enquiredTransaction = this.state.pageData.enquiredTransaction;
+
+    // if an enquired transaction is available, use that as basis
+    // otherwise initiate a new transaction
+    const initiateRequest = enquiredTransaction
+      ? sendOrderRequestAfterEnquiry(enquiredTransaction.id, requestParams)
+      : sendOrderRequest(requestParams, initialMessage);
+
+    initiateRequest
       .then(values => {
         const { orderId, initialMessageSuccess } = values;
         this.setState({ submitting: false });
@@ -210,7 +236,7 @@ export class CheckoutPageComponent extends Component {
 
     const isLoading = !this.state.dataLoaded || speculateTransactionInProgress;
 
-    const { listing, bookingDates } = this.state.pageData;
+    const { listing, bookingDates, enquiredTransaction } = this.state.pageData;
     const currentTransaction = ensureTransaction(speculatedTransaction, {}, null);
     const currentBooking = ensureBooking(currentTransaction.booking);
     const currentListing = ensureListing(listing);
@@ -378,6 +404,22 @@ export class CheckoutPageComponent extends Component {
       </div>
     );
 
+    const unitType = config.bookingUnitType;
+    const isNightly = unitType === LINE_ITEM_NIGHT;
+    const isDaily = unitType === LINE_ITEM_DAY;
+
+    const unitTranslationKey = isNightly
+      ? 'CheckoutPage.perNight'
+      : isDaily
+      ? 'CheckoutPage.perDay'
+      : 'CheckoutPage.perUnit';
+
+    const price = currentListing.attributes.price;
+    const formattedPrice = formatMoney(intl, price);
+    const detailsSubTitle = `${formattedPrice} ${intl.formatMessage({ id: unitTranslationKey })}`;
+
+    const showInitialMessageInput = !enquiredTransaction;
+
     const pageProps = { title, scrollingDisabled };
 
     if (isLoading) {
@@ -410,12 +452,10 @@ export class CheckoutPageComponent extends Component {
             <div className={css.heading}>
               <h1 className={css.title}>{title}</h1>
               <div className={css.author}>
-                <span className={css.authorName}>
-                  <FormattedMessage
-                    id="ListingPage.hostedBy"
-                    values={{ name: currentAuthor.attributes.profile.displayName }}
-                  />
-                </span>
+                <FormattedMessage
+                  id="CheckoutPage.hostedBy"
+                  values={{ name: currentAuthor.attributes.profile.displayName }}
+                />
               </div>
             </div>
 
@@ -439,6 +479,7 @@ export class CheckoutPageComponent extends Component {
                   formId="CheckoutPagePaymentForm"
                   paymentInfo={intl.formatMessage({ id: 'CheckoutPage.paymentInfo' })}
                   authorDisplayName={currentAuthor.attributes.profile.displayName}
+                  showInitialMessageInput={showInitialMessageInput}
                 />
               ) : null}
             </section>
@@ -458,12 +499,7 @@ export class CheckoutPageComponent extends Component {
             </div>
             <div className={css.detailsHeadings}>
               <h2 className={css.detailsTitle}>{listingTitle}</h2>
-              <p className={css.detailsSubtitle}>
-                <FormattedMessage
-                  id="CheckoutPage.hostedBy"
-                  values={{ name: currentAuthor.attributes.profile.displayName }}
-                />
-              </p>
+              <p className={css.detailsSubtitle}>{detailsSubTitle}</p>
             </div>
             <h3 className={css.bookingBreakdownTitle}>
               <FormattedMessage id="CheckoutPage.priceBreakdownTitle" />
@@ -484,6 +520,7 @@ CheckoutPageComponent.defaultProps = {
   bookingDates: null,
   speculateTransactionError: null,
   speculatedTransaction: null,
+  enquiredTransaction: null,
   currentUser: null,
 };
 
@@ -499,6 +536,7 @@ CheckoutPageComponent.propTypes = {
   speculateTransactionInProgress: bool.isRequired,
   speculateTransactionError: propTypes.error,
   speculatedTransaction: propTypes.transaction,
+  enquiredTransaction: propTypes.transaction,
   initiateOrderError: propTypes.error,
   currentUser: propTypes.currentUser,
   params: shape({
@@ -527,6 +565,7 @@ const mapStateToProps = state => {
     speculateTransactionInProgress,
     speculateTransactionError,
     speculatedTransaction,
+    enquiredTransaction,
     initiateOrderError,
   } = state.CheckoutPage;
   const { currentUser } = state.user;
@@ -538,6 +577,7 @@ const mapStateToProps = state => {
     speculateTransactionInProgress,
     speculateTransactionError,
     speculatedTransaction,
+    enquiredTransaction,
     listing,
     initiateOrderError,
   };
@@ -549,6 +589,9 @@ const mapDispatchToProps = dispatch => ({
   dispatch,
   sendOrderRequest: (params, initialMessage, listingType) => dispatch(initiateOrder(params, initialMessage, listingType)),
   fetchSpeculatedTransaction: (params, listingType) => dispatch(speculateTransaction(params, listingType)),
+  sendOrderRequestAfterEnquiry: (transactionId, params) =>
+    dispatch(initiateOrderAfterEnquiry(transactionId, params)),
+  fetchSpeculatedTransaction: params => dispatch(speculateTransaction(params)),
 });
 
 const CheckoutPage = compose(
