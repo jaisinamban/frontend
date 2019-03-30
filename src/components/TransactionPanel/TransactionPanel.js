@@ -29,8 +29,8 @@ import DetailCardHeadingsMaybe from './DetailCardHeadingsMaybe';
 import DetailCardImage from './DetailCardImage';
 import FeedSection from './FeedSection';
 import SaleActionButtonsMaybe from './SaleActionButtonsMaybe';
-import OrderAttendance from './OrderAttendance';
-import OrderOccasion from './OrderOccasion';
+import { OrderAttendance } from './OrderAttendance';
+import { OrderOccasion } from './OrderOccasion';
 import PanelHeading, {
   HEADING_ENQUIRED,
   HEADING_REQUESTED,

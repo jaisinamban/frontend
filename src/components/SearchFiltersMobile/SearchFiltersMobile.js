@@ -13,6 +13,7 @@ import {
   Button,
   PriceFilter,
   SelectSingleFilter,
+  SelectSingleFilterPlain,
   SelectMultipleFilter,
   BookingDateRangeFilter,
 } from '../../components';
@@ -261,20 +262,6 @@ class SearchFiltersMobileComponent extends Component {
         intl={intl}
       />
     ) : null;
-
-    const initialDateRange = this.initialDateRangeValue(dateRangeFilter.paramName);
-
-    const dateRangeFilterElement =
-      dateRangeFilter && dateRangeFilter.config.active ? (
-        <BookingDateRangeFilter
-          id="SearchFilters.dateRangeFilter"
-          urlParam={dateRangeFilter.paramName}
-          onSubmit={this.handleDateRange}
-          liveEdit
-          showAsPopup={false}
-          initialValues={initialDateRange}
-        />
-      ) : null;
 
     return (
       <div className={classes}>

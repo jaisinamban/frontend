@@ -36,10 +36,6 @@ export const PHOTOS = 'photos';
 
 // EditListingWizardTab component supports these tabs
 export const SUPPORTED_TABS = [
-<<<<<<< HEAD
-	DESCRIPTION, FEATURES, CAPACITY, REGULARLY_OPEN_ON, 
-	POLICY, LOCATION, PRICING, PHOTOS];
-=======
   DESCRIPTION,
   FEATURES,
   POLICY,
@@ -48,7 +44,6 @@ export const SUPPORTED_TABS = [
   AVAILABILITY,
   PHOTOS,
 ];
->>>>>>> upstream/master
 
 const pathParamsToNextTab = (params, tab, marketplaceTabs) => {
   const nextTabIndex = marketplaceTabs.findIndex(s => s === tab) + 1;

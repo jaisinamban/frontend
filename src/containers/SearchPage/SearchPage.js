@@ -70,10 +70,6 @@ export class SearchPageComponent extends Component {
         paramName: 'pub_type',
         options: listingTypes,
       },
-      dateRangeFilter: {
-        paramName: 'dates',
-        config: dateRangeFilterConfig,
-      },
     };
   }
 

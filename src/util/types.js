@@ -381,7 +381,6 @@ const filterIsActiveConfig = shape({
 
 propTypes.filterConfig = oneOfType([
   filterWithOptions,
-  filterWithPriceConfig,
   filterIsActiveConfig,
 ]);
 
